@@ -1,0 +1,34 @@
+{
+  "name": "@mailprotector/haraka-plugin-rcpt-http",
+  "version": "1.0.6",
+  "description": "A Haraka Plugin that checks recipients are valid via HTTP",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint *.js test/*.js",
+    "lintfix": "npx eslint --fix *.js test/*.js",
+    "versions": "npx dependency-version-checker check",
+    "test": "jest ./test --detectOpenHandles"
+  },
+  "keywords": [
+    "Haraka",
+    "Rails",
+    "Http",
+    "Queue",
+    "SMTP",
+    "Relay"
+  ],
+  "author": "Mailprotector Team <npm@mailprotector.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mailprotector/haraka-plugin-rcpt-http/issues"
+  },
+  "homepage": "https://github.com/mailprotector/haraka-plugin-rcpt-http#readme",
+  "dependencies": {
+    "axios": "^0.23.0"
+  },
+  "devDependencies": {
+    "eslint": "*",
+    "eslint-plugin-haraka": "*",
+    "jest": "*"
+  }
+}
