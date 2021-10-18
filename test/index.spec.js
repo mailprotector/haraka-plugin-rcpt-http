@@ -1,6 +1,7 @@
 const { rcpt_http_test, load_config, register } = require('../index');
 
 global.DENYSOFT = 450;
+global.OK = 200;
 
 describe('register', () => {
   test('registers plugin and loads config', () => {
@@ -51,10 +52,80 @@ describe('load_config', () => {
   });
 });
 
-// describe('rcpt_http', () => {
-//
-//   test('register', () => {
-//
-//   });
-//
-// });
+describe('rcpt_http', () => {
+  test('response OK with a SUCCESS 200 API status code', testComplete => {
+    const axiosMock = {
+      post: jest.fn(() => {
+        return new Promise(function(resolve, reject) {
+          resolve({
+            status: 200,
+            data: {
+              message: 'test_message',
+              code: OK
+            }
+          });
+        });
+      })
+    };
+
+    const transaction = {
+      rcpt_to: 'to-addr',
+    };
+
+    const remote = {
+      ip: '192.168.0.1',
+      host: 'testhost'
+    };
+
+    const logerror = msg => {
+      console.log(msg);
+    };
+
+    const hello = { host: 'hello-host' };
+
+    const connection = { transaction, remote, hello, logerror };
+
+    const next = (statusCode, reason) => {
+      console.log('running next');
+      try {
+        expect(statusCode).toEqual(OK);
+        expect(reason).toEqual('test_message');
+
+        expect(axiosMock.post.mock.calls[0][0]).toEqual('RCPT_URL');
+
+        const expectedBody = {
+          email: transaction.rcpt_to,
+          ip: remote.ip
+        };
+
+        expect(typeof axiosMock.post.mock.calls[0][1]).toEqual(expectedBody);
+        expect(axiosMock.post.mock.calls[0][2]).toEqual({
+          "headers": {
+            "Authorization": "Basic YWN0aW9ubWFpbGJveDpBQ1RJT05fTUFJTEJPWF9QQVNTV09SRA==",
+          }
+        });
+        expect(axiosMock.post.mock.calls[1]).toEqual(undefined);
+      } catch (err) {
+        console.log(err);
+      }
+
+      testComplete();
+    };
+
+    class TestClass  {
+      constructor() {
+        this.cfg = {
+          USERNAME: 'USERNAME',
+          PASSWORD: 'PASSWORD',
+          RCPT_URL: 'RCPT_URL'
+        };
+      };
+    };
+
+    testFunc = new TestClass();
+    testFunc.rcpt_http = rcpt_http_test(axiosMock);
+
+    testFunc.rcpt_http(next, connection);
+  });
+
+});

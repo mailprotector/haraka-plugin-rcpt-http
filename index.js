@@ -28,9 +28,12 @@
       const plugin = this;
 
       const handleError = err => {
-        if (err) {
-          plugin.logerror(err.message || message, connection);
+        if (err != undefined) {
+          console.log('hit');
+          console.log(connection);
+          plugin.logerror(err.message || err, connection);
         }
+        console.log('hit 2');
         next(DENYSOFT);
       }
 
@@ -46,12 +49,12 @@
       }
 
       axios.post(this.cfg.RCPT_URL, body, options).then(response => {
-        if (response.code >= 200 && response.code < 600) {
-          next(response.code, response.message);
+        if (response.data.code >= 200 && response.data.code < 600) {
+          next(response.status, response.data.message);
         } else {
-          handleError(`INVALID HTTP RESPONSE CODE ${response.code}:${response.message}`);
+          handleError(`INVALID HTTP RESPONSE CODE ${response.data.code}:${response.data.message}`);
         }
-      }).catch(handleError);
+      }).catch(err => handleError(err));
     }
   }
 
