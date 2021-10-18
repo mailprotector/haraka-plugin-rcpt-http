@@ -1,17 +1,18 @@
 (() => {
 
   exports.register = function () {
-    this.register('rcpt', 'rcpt_http');
+    this.register_hook('rcpt', 'rcpt_http');
     this.load_config();
   }
 
-  exports.load_config = () => {
+  exports.load_config = function () {
+    console.log('loading');
     this.cfg = this.config.get('rcpt_http.json', this.load_config);
 
     if (this.cfg.USERNAME && this.cfg.PASSWORD) {
       this.auth = true;
 
-      const authString = `${plugin.cfg.PASSWORD}:${plugin.cfg.PASSWORD}`;
+      const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
       const authBase64 = new Buffer.from(authString).toString('base64');
 
       this.authHeaders = {
@@ -48,11 +49,9 @@
         if (response.code >= 200 && response.code < 600) {
           next(response.code, response.message);
         } else {
-          handleError('HTTP RESPONSE CODE INVALID');
+          handleError(`INVALID HTTP RESPONSE CODE ${response.code}:${response.message}`);
         }
-      }).catch(err => {
-        handleError(err);
-      });
+      }).catch(handleError);
     }
   }
 
