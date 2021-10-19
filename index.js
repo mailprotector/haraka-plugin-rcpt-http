@@ -39,7 +39,7 @@
 
       axios.post(this.cfg.URL, body, options).then(response => {
         if (response.status >= 200 && response.status < 600) {
-          next(response.status, response.data);
+          next(response.data.code, response.data.message);
         } else {
           next(DENYSOFT, `Backend failure. Please, retry later ${response.status}`);
         }

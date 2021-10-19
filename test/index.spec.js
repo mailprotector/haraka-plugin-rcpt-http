@@ -59,7 +59,10 @@ describe('rcpt_http', () => {
         return new Promise(function(resolve, reject) {
           resolve({
             status: 200,
-            data: 'test_message'
+            data: {
+              code: OK,
+              message: 'test_message'
+            }
           });
         });
       })
@@ -127,7 +130,10 @@ describe('rcpt_http', () => {
         return new Promise(function(resolve, reject) {
           resolve({
             status: 9000,
-            data: 'test_message'
+            data: {
+              code: OK,
+              message: 'test_message'
+            }
           });
         });
       })
@@ -153,6 +159,8 @@ describe('rcpt_http', () => {
     const next = (statusCode, reason) => {
       try {
         expect(statusCode).toEqual(DENYSOFT);
+        expect(reason).toEqual('Backend failure. Please, retry later 9000');
+
         expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
 
         const expectedBody = {
