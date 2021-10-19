@@ -6,7 +6,6 @@
   }
 
   exports.load_config = function () {
-    console.log('loading');
     this.cfg = this.config.get('rcpt_http.json', this.load_config);
 
     if (this.cfg.USERNAME && this.cfg.PASSWORD) {
@@ -27,16 +26,6 @@
     return function (next, connection) {
       const plugin = this;
 
-      const handleError = err => {
-        if (err != undefined) {
-          console.log('hit');
-          console.log(connection);
-          plugin.logerror(err.message || err, connection);
-        }
-        console.log('hit 2');
-        next(DENYSOFT);
-      }
-
       const body = {
         email: connection.transaction.rcpt_to,
         ip: connection.remote.ip
@@ -52,9 +41,14 @@
         if (response.data.code >= 200 && response.data.code < 600) {
           next(response.status, response.data.message);
         } else {
-          handleError(`INVALID HTTP RESPONSE CODE ${response.data.code}:${response.data.message}`);
+          next(DENYSOFT, `INVALID HTTP RESPONSE CODE ${response.data.code}:${response.data.message}`);
         }
-      }).catch(err => handleError(err));
+      }).catch(err => {
+        if (err != undefined) {
+          connection.logerror(err.message || err, connection);
+        }
+        next(DENYSOFT, 'unknown error');
+      });
     }
   }
 
