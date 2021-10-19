@@ -45,7 +45,7 @@
         }
       }).catch(err => {
         if (err != undefined) {
-          connection.logerror(err.message || err, connection);
+          connection.logerror(err.message || err);
         }
         next(DENYSOFT, 'Backend failure. Please, retry later');
       });
