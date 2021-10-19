@@ -1,5 +1,5 @@
 {
   "USERNAME": "testuser",
   "PASSWORD": "badpassword",
-  "RCPT_URL": "http://localhost:3000/rcpt_valid_check"
+  "URL": "http://localhost:3000/rcpt_valid_check"
 }

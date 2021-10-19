@@ -37,11 +37,11 @@
         options.headers = plugin.authHeaders;
       }
 
-      axios.post(this.cfg.RCPT_URL, body, options).then(response => {
+      axios.post(this.cfg.URL, body, options).then(response => {
         if (response.status >= 200 && response.status < 600) {
           next(response.status, response.data);
         } else {
-          next(DENYSOFT, `Backend failure. Please, retry later`);
+          next(DENYSOFT, `Backend failure. Please, retry later ${response.status}`);
         }
       }).catch(err => {
         if (err != undefined) {

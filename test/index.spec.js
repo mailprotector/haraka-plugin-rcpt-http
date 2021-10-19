@@ -33,7 +33,7 @@ describe('load_config', () => {
     const getConfigMock = jest.fn(() => ({
       USERNAME: 'USERNAME',
       PASSWORD: 'PASSWORD',
-      RCPT_URL: 'RCPT_URL'
+      URL: 'URL'
     }));
 
     const logWarningMock = jest.fn(() => {});
@@ -87,7 +87,7 @@ describe('rcpt_http', () => {
         expect(statusCode).toEqual(OK);
         expect(reason).toEqual('test_message');
 
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('RCPT_URL');
+        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
 
         const expectedBody = {
           email: transaction.rcpt_to,
@@ -107,7 +107,7 @@ describe('rcpt_http', () => {
     class TestClass  {
       constructor() {
         this.cfg = {
-          RCPT_URL: 'RCPT_URL'
+          URL: 'URL'
         };
 
         this.auth = true;
@@ -153,7 +153,7 @@ describe('rcpt_http', () => {
     const next = (statusCode, reason) => {
       try {
         expect(statusCode).toEqual(DENYSOFT);
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('RCPT_URL');
+        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
 
         const expectedBody = {
           email: transaction.rcpt_to,
@@ -173,7 +173,7 @@ describe('rcpt_http', () => {
     class TestClass  {
       constructor() {
         this.cfg = {
-          RCPT_URL: 'RCPT_URL'
+          URL: 'URL'
         };
 
         this.auth = true;
@@ -186,7 +186,7 @@ describe('rcpt_http', () => {
 
     testFunc.rcpt_http(next, connection);
   });
-  
+
   test('denysoft with an http error', testComplete => {
     const axiosMock = {
       post: jest.fn(() => {
@@ -217,7 +217,7 @@ describe('rcpt_http', () => {
       try {
         expect(statusCode).toEqual(DENYSOFT);
         expect(reason).toEqual('Backend failure. Please, retry later');
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('RCPT_URL');
+        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
 
         const expectedBody = {
           email: transaction.rcpt_to,
@@ -237,7 +237,7 @@ describe('rcpt_http', () => {
     class TestClass  {
       constructor() {
         this.cfg = {
-          RCPT_URL: 'RCPT_URL'
+          URL: 'URL'
         };
 
         this.auth = true;
