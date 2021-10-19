@@ -32,8 +32,8 @@ Without the User/Pass will do an unauthenticated POST to RCPT_URL.
 The following POST body will be sent to RCPT_URL
 ```js
 {
-  email: transaction.rcpt_to,
-  ip: remote.ip
+  email: connection.transaction.rcpt_to,
+  ip: connection.remote.ip
 }
 ```
 
