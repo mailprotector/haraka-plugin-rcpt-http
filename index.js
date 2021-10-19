@@ -38,16 +38,16 @@
       }
 
       axios.post(this.cfg.RCPT_URL, body, options).then(response => {
-        if (response.data.code >= 200 && response.data.code < 600) {
-          next(response.status, response.data.message);
+        if (response.status >= 200 && response.status < 600) {
+          next(response.status, response.data);
         } else {
-          next(DENYSOFT, `INVALID HTTP RESPONSE CODE ${response.data.code}:${response.data.message}`);
+          next(DENYSOFT, `Backend failure. Please, retry later`);
         }
       }).catch(err => {
         if (err != undefined) {
           connection.logerror(err.message || err, connection);
         }
-        next(DENYSOFT, 'unknown error');
+        next(DENYSOFT, 'Backend failure. Please, retry later');
       });
     }
   }
