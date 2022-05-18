@@ -6,20 +6,41 @@
   }
 
   exports.load_config = function () {
-    this.cfg = this.config.get('rcpt_http.json', this.load_config);
+    const retryCount = 0;
+    let retryLimit = 2;
 
-    if (this.cfg.USERNAME && this.cfg.PASSWORD) {
-      this.auth = true;
+    const attemptLoadConfig = () => {
+      console.log('hit')
+      retryLimit += 1;
 
-      const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
-      const authBase64 = new Buffer.from(authString).toString('base64');
+      if (retryLimit <= retryCount) {
+        console.log('return')
+        return;
+      }
 
-      this.authHeaders = {
-        Authorization: `Basic ${authBase64}`,
-      };
-    } else {
-      this.auth = false;
+      try {
+        console.log('trying')
+        this.cfg = this.config.get('rcpt_http.json', this.load_config);
+        console.log('success')
+        if (this.cfg.USERNAME && this.cfg.PASSWORD) {
+          this.auth = true;
+
+          const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
+          const authBase64 = new Buffer.from(authString).toString('base64');
+
+          this.authHeaders = {
+            Authorization: `Basic ${authBase64}`,
+          };
+        } else {
+          this.auth = false;
+        }
+      } catch (e) {
+        setTimeout(attemptLoadConfig, 5000);
+      }
     }
+
+
+    attemptLoadConfig();
   };
 
   const buildRcptHttp = axios => {
