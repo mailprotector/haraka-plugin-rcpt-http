@@ -22,9 +22,9 @@ describe('register', () => {
     expect(registerHookMock.mock.calls[0][0]).toEqual('rcpt');
     expect(registerHookMock.mock.calls[0][1]).toEqual('rcpt_http');
     expect(registerHookMock.mock.calls[0][3]).toEqual(undefined);
-    expect(registerHookMock.mock.calls[1]).toEqual(["init_master", "load_config"]);
+    expect(registerHookMock.mock.calls[1]).toEqual(undefined);
 
-    expect(loadConfigMock.mock.calls[0]).toEqual(undefined);
+    expect(loadConfigMock.mock.calls[0]).toEqual([]);
   });
 });
 
@@ -99,7 +99,7 @@ describe('rcpt_http', () => {
 
         expect(axiosMock.post.mock.calls[0][1]).toEqual(expectedBody);
         expect(axiosMock.post.mock.calls[0][2]).toEqual({ headers: { test: 'ing' } });
-        expect(axiosMock.post.mock.calls[1]).toEqual();
+        expect(axiosMock.post.mock.calls[1]).toEqual(undefined);
       } catch (err) {
         console.log(err);
       }

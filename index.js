@@ -2,11 +2,12 @@
 
   exports.register = function () {
     this.register_hook('rcpt', 'rcpt_http');
-    this.register_hook('init_master', 'load_config');
+    this.load_config();
   }
 
   exports.load_config = function () {
     this.cfg = this.config.get('rcpt_http.json', this.load_config);
+
     if (this.cfg.USERNAME && this.cfg.PASSWORD) {
       this.auth = true;
 
