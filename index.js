@@ -10,18 +10,14 @@
     let retryLimit = 2;
 
     const attemptLoadConfig = () => {
-      console.log('hit')
       retryLimit += 1;
 
       if (retryLimit <= retryCount) {
-        console.log('return')
         return;
       }
 
       try {
-        console.log('trying')
         this.cfg = this.config.get('rcpt_http.json', this.load_config);
-        console.log('success')
         if (this.cfg.USERNAME && this.cfg.PASSWORD) {
           this.auth = true;
 
