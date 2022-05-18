@@ -2,41 +2,23 @@
 
   exports.register = function () {
     this.register_hook('rcpt', 'rcpt_http');
-    this.load_config();
+    this.register_hook('init_master', 'load_config');
   }
 
   exports.load_config = function () {
-    const retryCount = 0;
-    let retryLimit = 2;
+    this.cfg = this.config.get('rcpt_http.json', this.load_config);
+    if (this.cfg.USERNAME && this.cfg.PASSWORD) {
+      this.auth = true;
 
-    const attemptLoadConfig = () => {
-      retryLimit += 1;
+      const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
+      const authBase64 = new Buffer.from(authString).toString('base64');
 
-      if (retryLimit <= retryCount) {
-        return;
-      }
-
-      try {
-        this.cfg = this.config.get('rcpt_http.json', this.load_config);
-        if (this.cfg.USERNAME && this.cfg.PASSWORD) {
-          this.auth = true;
-
-          const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
-          const authBase64 = new Buffer.from(authString).toString('base64');
-
-          this.authHeaders = {
-            Authorization: `Basic ${authBase64}`,
-          };
-        } else {
-          this.auth = false;
-        }
-      } catch (e) {
-        setTimeout(attemptLoadConfig, 5000);
-      }
+      this.authHeaders = {
+        Authorization: `Basic ${authBase64}`,
+      };
+    } else {
+      this.auth = false;
     }
-
-
-    attemptLoadConfig();
   };
 
   const buildRcptHttp = axios => {
