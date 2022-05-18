@@ -1,6 +1,6 @@
 {
   "name": "@mailprotector/haraka-plugin-rcpt-http",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Haraka Plugin that checks recipients are valid via HTTP",
   "main": "index.js",
   "scripts": {
