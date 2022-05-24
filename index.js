@@ -6,28 +6,44 @@
   }
 
   exports.load_config = function () {
-    this.cfg = this.config.get('rcpt_http.json', this.load_config);
+    const plugin = this;
 
-    if (this.cfg.USERNAME && this.cfg.PASSWORD) {
-      this.auth = true;
+    try {
+      plugin.cfg = this.config.get('rcpt-http.json', plugin.load_config);
+    } catch (err) { }
 
-      const authString = `${this.cfg.PASSWORD}:${this.cfg.PASSWORD}`;
+    if (plugin.cfg.URL == undefined) {
+      plugin.cfg.URL = process.env.RCPT_CHECK_URL;
+    }
+
+    if (plugin.cfg.USERNAME == undefined) {
+      plugin.cfg.USERNAME = process.env.USERNAME;
+    }
+
+    if (plugin.cfg.PASSWORD == undefined) {
+      plugin.cfg.PASSWORD = process.env.PASSWORD;
+    }
+
+    if (plugin.cfg.USERNAME !== undefined && plugin.cfg.PASSWORD !== undefined) {
+      plugin.auth = true;
+
+      const authString = `${plugin.cfg.PASSWORD}:${plugin.cfg.PASSWORD}`;
       const authBase64 = new Buffer.from(authString).toString('base64');
 
-      this.authHeaders = {
+      plugin.authHeaders = {
         Authorization: `Basic ${authBase64}`,
       };
     } else {
-      this.auth = false;
+      plugin.auth = false;
     }
   };
 
-  const buildRcptHttp = axios => {
-    return function (next, connection) {
+  function buildRcptHttp(axios, statusCodes) {
+    return function (next, connection, params) {
       const plugin = this;
 
       const body = {
-        email: connection.transaction.rcpt_to,
+        email: params[0].original,
         ip: connection.remote.ip
       };
 
@@ -37,19 +53,19 @@
         options.headers = plugin.authHeaders;
       }
 
-      axios.post(this.cfg.URL, body, options).then(response => {
+      axios.post(this.cfg.URL || process.env.RCPT_CHECK_URL, body, options).then(response => {
         if (response.status >= 200 && response.status < 600) {
           if (response.data.code == undefined) {
             next(DENYSOFT);
           } else {
-            next(response.data.code, response.data.message);
+            next(statusCodes[response.data.code], response.data.message);
           }
         } else {
           next(DENYSOFT, `Backend failure. Please, retry later ${response.status}`);
         }
       }).catch(err => {
         if (err != undefined) {
-          connection.logerror(err.message || err);
+          plugin.logerror(err.message || err);
         }
         next(DENYSOFT, 'Backend failure. Please, retry later');
       });
@@ -57,7 +73,10 @@
   }
 
   exports.rcpt_http_test = buildRcptHttp;
-
-  exports.rcpt_http = buildRcptHttp(require('axios'));
+  exports.rcpt_http = buildRcptHttp(require('axios'), {
+    OK: OK,
+    DENYSOFT: DENYSOFT,
+    DENY: DENY
+  });
 
 })();

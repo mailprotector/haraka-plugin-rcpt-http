@@ -30,5 +30,12 @@
     "eslint": "*",
     "eslint-plugin-haraka": "*",
     "jest": "*"
+  },
+  "jest": {
+    "globals": {
+      "OK": 609,
+      "DENY": 602,
+      "DENYSOFT": 603
+    }
   }
 }

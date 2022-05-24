@@ -1,7 +1,10 @@
 const { rcpt_http_test, load_config, register } = require('../index');
 
-global.DENYSOFT = 450;
-global.OK = 200;
+const statusCodes = {
+  OK: 906,
+  DENYSOFT: 903,
+  DENY: 902
+};
 
 describe('register', () => {
   test('registers plugin and loads config', () => {
@@ -48,7 +51,7 @@ describe('load_config', () => {
     testFunc.load_config = load_config;
     testFunc.load_config();
 
-    expect(getConfigMock.mock.calls[0][0]).toEqual('rcpt_http.json');
+    expect(getConfigMock.mock.calls[0][0]).toEqual('rcpt-http.json');
   });
 });
 
@@ -60,7 +63,7 @@ describe('rcpt_http', () => {
           resolve({
             status: 200,
             data: {
-              code: OK,
+              code: 'OK',
               message: 'test_message'
             }
           });
@@ -69,13 +72,17 @@ describe('rcpt_http', () => {
     };
 
     const transaction = {
-      rcpt_to: 'to-addr',
+      rcpt_to: '<test@test.com>',
     };
 
     const remote = {
       ip: '192.168.0.1',
       host: 'testhost'
     };
+
+    const params = [
+      { original: '<test@test.com>' }
+    ]
 
     const logerror = msg => {
       console.log(msg);
@@ -119,9 +126,9 @@ describe('rcpt_http', () => {
     };
 
     testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock);
+    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
 
-    testFunc.rcpt_http(next, connection);
+    testFunc.rcpt_http(next, connection, params);
   });
 
   test('denysoft with an invalid response code', testComplete => {
@@ -140,13 +147,17 @@ describe('rcpt_http', () => {
     };
 
     const transaction = {
-      rcpt_to: 'to-addr',
+      rcpt_to: '<test@test.com>',
     };
 
     const remote = {
       ip: '192.168.0.1',
       host: 'testhost'
     };
+
+    const params = [
+      { original: '<test@test.com>' }
+    ]
 
     const logerror = msg => {
       console.log(msg);
@@ -190,9 +201,9 @@ describe('rcpt_http', () => {
     };
 
     testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock);
+    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
 
-    testFunc.rcpt_http(next, connection);
+    testFunc.rcpt_http(next, connection, params);
   });
 
   test('denysoft with an http error', testComplete => {
@@ -205,7 +216,7 @@ describe('rcpt_http', () => {
     };
 
     const transaction = {
-      rcpt_to: 'to-addr',
+      rcpt_to: '<test@test.com>',
     };
 
     const remote = {
@@ -213,13 +224,13 @@ describe('rcpt_http', () => {
       host: 'testhost'
     };
 
-    const logerror = msg => {
-      // console.log(msg);
-    };
+    const params = [
+      { original: '<test@test.com>' }
+    ]
 
     const hello = { host: 'hello-host' };
 
-    const connection = { transaction, remote, hello, logerror };
+    const connection = { transaction, remote, hello };
 
     const next = (statusCode, reason) => {
       try {
@@ -250,12 +261,13 @@ describe('rcpt_http', () => {
 
         this.auth = true;
         this.authHeaders = { test: 'ing' };
+        this.logerror = () => {};
       }
     };
 
     testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock);
+    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
 
-    testFunc.rcpt_http(next, connection);
+    testFunc.rcpt_http(next, connection, params);
   });
 });
