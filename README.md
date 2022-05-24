@@ -23,7 +23,7 @@ Config options are set in `rcpt_http.json`:
 | ----------------------- | --------------------------------------------- | ------ | ------------- |
 | USERNAME                | HTTP server username                          | string | none          |
 | PASSWORD                | HTTP server password                          | string | none          |
-| URL                     | The URL endpoint of the HTTP server           | string | none          |
+| RCPT_CHECK_URL          | The URL endpoint of the HTTP server           | string | none          |
 
 ## Details
 The http API call uses a `POST` to `RCPT_URL` with `basic auth` if a USERNAME and PASSWORD are provided in config.
