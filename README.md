@@ -19,11 +19,11 @@ Add to `plugin` file in the haraka config folder
 
 Config options are set in `rcpt_http.json`:
 
-| Parameter               | Description                                   | Type   | Default Value |
-| ----------------------- | --------------------------------------------- | ------ | ------------- |
-| USERNAME                | HTTP server username                          | string | none          |
-| PASSWORD                | HTTP server password                          | string | none          |
-| RCPT_CHECK_URL          | The URL endpoint of the HTTP server           | string | none          |
+| Parameter      | Description                         | Type   | Default Value |
+| -------------- | ----------------------------------- | ------ | ------------- |
+| USERNAME       | HTTP server username                | string | none          |
+| PASSWORD       | HTTP server password                | string | none          |
+| RCPT_CHECK_URL | The URL endpoint of the HTTP server | string | none          |
 
 ## Details
 The http API call uses a `POST` to `RCPT_URL` with `basic auth` if a USERNAME and PASSWORD are provided in config.
@@ -38,5 +38,5 @@ The following POST body will be sent to RCPT_URL
 ```
 
 ##
-![alt text](https://i1.wp.com/mailprotector.com/wp-content/uploads/2020/03/cropped-logo-2x.png)
+![alt text](https://mailprotector.com/wp-content/uploads/2022/07/MP-Left-RGB.png)
 [About Mailprotector](https://mailprotector.com/about-mailprotector)
