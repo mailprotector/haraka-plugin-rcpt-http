@@ -1,273 +1,47 @@
-const { rcpt_http_test, load_config, register } = require('../index');
+const { 
+  register,
+  load_config,
+  load_tls_ini,
+  hook_capabilities,
+  buildOptions,
+  checkUserValid,
+  checkAuthFromServer,
+  buildCheckPlainPasswdFunc
+} = require('../index');
 
 const statusCodes = {
-  OK: 906,
-  DENYSOFT: 903,
-  DENY: 902
+  OK: 200,
+  BAD: 500
 };
 
 describe('register', () => {
-  test('registers plugin and loads config', () => {
-    const registerHookMock = jest.fn(() => {});
-    const loadConfigMock = jest.fn(() => {});
-
-    class TestClass  {
-      constructor() {
-        this.register_hook = registerHookMock;
-        this.load_config = loadConfigMock;
-      }
-    };
-
-    testFunc = new TestClass();
-    testFunc.register = register;
-    testFunc.register();
-
-    expect(registerHookMock.mock.calls[0][0]).toEqual('rcpt');
-    expect(registerHookMock.mock.calls[0][1]).toEqual('rcpt_http');
-    expect(registerHookMock.mock.calls[0][3]).toEqual(undefined);
-    expect(registerHookMock.mock.calls[1]).toEqual(undefined);
-
-    expect(loadConfigMock.mock.calls[0]).toEqual([]);
-  });
+  // calls inherits
+  // calls load_tls_ini
+  // calls load_config
 });
 
 describe('load_config', () => {
-  test('success with all config values', () => {
-    const getConfigMock = jest.fn(() => ({
-      USERNAME: 'USERNAME',
-      PASSWORD: 'PASSWORD',
-      URL: 'URL'
-    }));
-
-    const logWarningMock = jest.fn(() => {});
-
-    class TestClass  {
-      constructor() {
-        this.config = { get: getConfigMock };
-      }
-    };
-
-    testFunc = new TestClass();
-    testFunc.load_config = load_config;
-    testFunc.load_config();
-
-    expect(getConfigMock.mock.calls[0][0]).toEqual('rcpt-http.json');
-  });
+  // plugin config to be set
+  // the get method was called with correct params
+  // expect()
 });
 
-describe('rcpt_http', () => {
-  test('response OK with a OK code', testComplete => {
-    const axiosMock = {
-      post: jest.fn(() => {
-        return new Promise(function(resolve, reject) {
-          resolve({
-            status: 200,
-            data: {
-              code: 'OK',
-              message: 'test_message'
-            }
-          });
-        });
-      })
-    };
+describe('load_tls_ini', () => {
 
-    const transaction = {
-      rcpt_to: '<test@test.com>',
-    };
+});
 
-    const remote = {
-      ip: '192.168.0.1',
-      host: 'testhost'
-    };
+describe('hook_capabilities', () => {
 
-    const params = [
-      { original: '<test@test.com>' }
-    ]
+});
 
-    const logerror = msg => {
-      console.log(msg);
-    };
+describe('checkAuthFromServer', () => {
 
-    const hello = { host: 'hello-host' };
+});
 
-    const connection = { transaction, remote, hello, logerror };
+describe('checkUserValid', () => {
 
-    const next = (statusCode, reason) => {
-      try {
-        expect(statusCode).toEqual(OK);
-        expect(reason).toEqual('test_message');
+});
 
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
+describe('buildOptions', () => {
 
-        const expectedBody = {
-          email: transaction.rcpt_to,
-          ip: remote.ip
-        };
-
-        expect(axiosMock.post.mock.calls[0][1]).toEqual(expectedBody);
-        expect(axiosMock.post.mock.calls[0][2]).toEqual({ headers: { test: 'ing' } });
-        expect(axiosMock.post.mock.calls[1]).toEqual(undefined);
-      } catch (err) {
-        console.log(err);
-      }
-
-      testComplete();
-    };
-
-    class TestClass  {
-      constructor() {
-        this.cfg = {
-          URL: 'URL'
-        };
-
-        this.auth = true;
-        this.authHeaders = { test: 'ing' };
-      };
-    };
-
-    testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
-
-    testFunc.rcpt_http(next, connection, params);
-  });
-
-  test('denysoft with an invalid response code', testComplete => {
-    const axiosMock = {
-      post: jest.fn(() => {
-        return new Promise(function(resolve, reject) {
-          resolve({
-            status: 9000,
-            data: {
-              code: OK,
-              message: 'test_message'
-            }
-          });
-        });
-      })
-    };
-
-    const transaction = {
-      rcpt_to: '<test@test.com>',
-    };
-
-    const remote = {
-      ip: '192.168.0.1',
-      host: 'testhost'
-    };
-
-    const params = [
-      { original: '<test@test.com>' }
-    ]
-
-    const logerror = msg => {
-      console.log(msg);
-    };
-
-    const hello = { host: 'hello-host' };
-
-    const connection = { transaction, remote, hello, logerror };
-
-    const next = (statusCode, reason) => {
-      try {
-        expect(statusCode).toEqual(DENYSOFT);
-        expect(reason).toEqual('Backend failure. Please, retry later 9000');
-
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
-
-        const expectedBody = {
-          email: transaction.rcpt_to,
-          ip: remote.ip
-        };
-
-        expect(axiosMock.post.mock.calls[0][1]).toEqual(expectedBody);
-        expect(axiosMock.post.mock.calls[0][2]).toEqual({ headers: { test: 'ing' } });
-        expect(axiosMock.post.mock.calls[1]).toEqual(undefined);
-      } catch (err) {
-        console.log(err);
-      }
-
-      testComplete();
-    };
-
-    class TestClass  {
-      constructor() {
-        this.cfg = {
-          URL: 'URL'
-        };
-
-        this.auth = true;
-        this.authHeaders = { test: 'ing' };
-      }
-    };
-
-    testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
-
-    testFunc.rcpt_http(next, connection, params);
-  });
-
-  test('denysoft with an http error', testComplete => {
-    const axiosMock = {
-      post: jest.fn(() => {
-        return new Promise(function(resolve, reject) {
-          reject({ message: 'PHAILURE' });
-        });
-      })
-    };
-
-    const transaction = {
-      rcpt_to: '<test@test.com>',
-    };
-
-    const remote = {
-      ip: '192.168.0.1',
-      host: 'testhost'
-    };
-
-    const params = [
-      { original: '<test@test.com>' }
-    ]
-
-    const hello = { host: 'hello-host' };
-
-    const connection = { transaction, remote, hello };
-
-    const next = (statusCode, reason) => {
-      try {
-        expect(statusCode).toEqual(DENYSOFT);
-        expect(reason).toEqual('Backend failure. Please, retry later');
-        expect(axiosMock.post.mock.calls[0][0]).toEqual('URL');
-
-        const expectedBody = {
-          email: transaction.rcpt_to,
-          ip: remote.ip
-        };
-
-        expect(axiosMock.post.mock.calls[0][1]).toEqual(expectedBody);
-        expect(axiosMock.post.mock.calls[0][2]).toEqual({ headers: { test: 'ing' } });
-        expect(axiosMock.post.mock.calls[1]).toEqual(undefined);
-      } catch (err) {
-        console.log(err);
-      }
-
-      testComplete();
-    };
-
-    class TestClass  {
-      constructor() {
-        this.cfg = {
-          URL: 'URL'
-        };
-
-        this.auth = true;
-        this.authHeaders = { test: 'ing' };
-        this.logerror = () => {};
-      }
-    };
-
-    testFunc = new TestClass();
-    testFunc.rcpt_http = rcpt_http_test(axiosMock, statusCodes);
-
-    testFunc.rcpt_http(next, connection, params);
-  });
 });
