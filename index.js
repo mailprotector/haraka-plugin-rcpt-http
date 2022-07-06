@@ -7,7 +7,7 @@
     }
 
     exports.load_config = function(plugin) {
-        plugin.config = plugin.cfg.get('http-auth.json', plugin.load_config);
+        plugin.cfg = plugin.cfg.get('http-auth.json', plugin.load_config);
     }
 
     exports.load_tls_ini = function (plugin) {
@@ -23,12 +23,9 @@
         next();
     }
 
-    const checkAuthFromServer = (axios, plugin, body, options, next) => {
-        axios.post(plugin.config.AUTH_CHECK_URL || process.env.AUTH_CHECK_URL, body, options).then(response => {
-            if (response.status != 200) { 
-                plugin.logwarning(JSON.stringify(response.data));
-                return next(false);
-            }
+    const checkAuthFromServer = (URL, body, options, connection, next) => {
+        axios.post(URL || process.env.AUTH_CHECK_URL, body, options).then(response => {
+            if (response.status != 200) { return next(false); }
             next(true);
         }).catch(err => { next(false); });
     };
@@ -44,13 +41,13 @@
     };
 
     const buildOptions = (plugin) => {
-        const authString = `actionmailbox:${plugin.config.ACTION_MAILBOX_PASSWORD}`;
+        const authString = `actionmailbox:${plugin.cfg.ACTION_MAILBOX_PASSWORD}`;
         const authBase64 = new Buffer.from(authString).toString('base64');
 
         const options = {
             headers: {
                 'Content-Type': 'message/rfc822',
-                'User-Agent': plugin.config.USER_AGENT,
+                'User-Agent': plugin.cfg.USER_AGENT,
                 'Authorization': `Basic ${authBase64}`
             }
         };
@@ -64,7 +61,7 @@
             checkUserValid(plugin, connection, next);
 
             const body = { user: user.toLowerCase(), pass: passwd };
-            checkAuthFromServer(axios, plugin, body, buildOptions(plugin), next);
+            checkAuthFromServer(axios, plugin.cfg.URL, body, buildOptions(plugin), connection, next);
         }
     };
 
