@@ -1,17 +1,25 @@
-((utils, the_real_axios ) => {
+((utils, the_axios ) => {
     exports.register = function () {
         const plugin = this;
         plugin.inherits('auth/auth_base');
-        plugin.load_tls_ini(plugin);
-        plugin.load_config(plugin);
+        plugin.load_tls_ini();
+        plugin.load_config();
     }
 
-    exports.load_config = function(plugin) {
-        plugin.cfg = plugin.cfg.get('http-auth.json', plugin.load_config);
+    exports.load_config = function() {
+        const plugin = this;
+
+        plugin.cfg = plugin.cfg.get('http-auth.json', () => {
+            plugin.load_config();
+        });
     }
 
-    exports.load_tls_ini = function (plugin) {
-        plugin.tls_cfg = plugin.config.get('tls.ini', plugin.load_tls_ini);
+    exports.load_tls_ini = function () {
+        const plugin = this;
+
+        plugin.tls_cfg = plugin.config.get('tls.ini', () => {
+            plugin.load_tls_ini();
+        });
     }
 
     exports.hook_capabilities = (next, connection) => {
@@ -35,7 +43,7 @@
         if ((domain = /@([^@]+)$/.exec(user))) {
             domain = domain[1].toLowerCase();
         } else {
-            plugin.logwarning(`AUTH user="${user}" error="not in required format"`);
+            connection.logwarning(plugin, `AUTH user="${user}" error="not in required format"`);
             return next(false);
         }
     };
@@ -61,14 +69,14 @@
             checkUserValid(plugin, connection, next);
 
             const body = { user: user.toLowerCase(), pass: passwd };
-            checkAuthFromServer(axios, plugin.cfg.URL, body, buildOptions(plugin), connection, next);
+            checkAuthFromServer(axios, plugin.cfg.URL, body, buildOptions(this), connection, next);
         }
     };
 
+    // haraka's required exports func
+    exports.check_plain_passwd = buildCheckPlainPasswdFunc(the_axios);
+    
     exports.buildOptions = buildOptions;
     exports.checkUserValid = checkUserValid;
-    exports.checkAuthFromServer = checkAuthFromServer;
     exports.buildCheckPlainPasswdFunc = buildCheckPlainPasswdFunc;
-    // haraka's required exports func
-    exports.check_plain_passwd = buildCheckPlainPasswdFunc(the_real_axios);
 })(require('haraka-utils'), require('axios'));
