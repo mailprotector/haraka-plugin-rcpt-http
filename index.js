@@ -69,7 +69,7 @@
             checkUserValid(plugin, connection, next);
 
             const body = { user: user.toLowerCase(), pass: passwd };
-            checkAuthFromServer(axios, plugin.cfg.URL, body, buildOptions(this), connection, next);
+            checkAuthFromServer(plugin.cfg.URL, body, buildOptions(this), connection, next);
         }
     };
 
