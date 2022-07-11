@@ -27,7 +27,7 @@
     if (plugin.cfg.USERNAME !== undefined && plugin.cfg.PASSWORD !== undefined) {
       plugin.auth = true;
 
-      const authString = `${plugin.cfg.PASSWORD}:${plugin.cfg.PASSWORD}`;
+      const authString = `${plugin.cfg.USERNAME}:${plugin.cfg.PASSWORD}`;
       const authBase64 = new Buffer.from(authString).toString('base64');
 
       plugin.authHeaders = {
